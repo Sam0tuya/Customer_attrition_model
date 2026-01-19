@@ -32,7 +32,16 @@ authenticator = stauth.Authenticate(
 # -----------------------
 st.title("Customer Attrition Prediction System")
 
-name, authentication_status, username = authenticator.login("Login", location="main")
+login_status = authenticator.login("Login")
+
+if login_status:
+    st.success(f"Welcome {authenticator.credentials['admin']['name']}!")
+    # Place your entire app code here
+
+elif login_status is False:
+    st.error("Username/password is incorrect")
+else:  # None
+    st.warning("Please log in to continue")
 
 # -----------------------
 # REGISTRATION SECTION
@@ -161,4 +170,5 @@ elif authentication_status is False:
 
 elif authentication_status is None:
     st.warning("Please log in to access the app")
+
 
