@@ -32,9 +32,21 @@ authenticator = stauth.Authenticate(
 # -----------------------
 st.title("Customer Attrition Prediction System")
 
-# login returns True / False / None
-# The login function returns a tuple of (name, authentication_status, username)
-name, authentication_status, username = authenticator.login(location='main')
+# NEW CODE
+authenticator.login(location='main')
+
+if st.session_state['authentication_status']:
+    authenticator.logout(location='sidebar') # Adds a logout button to the sidebar
+    st.write(f'Welcome *{st.session_state["name"]}*')
+    
+    # --- YOUR MAIN APP CODE GOES HERE ---
+    # Indent all your existing model code to be inside this 'if' block
+    # so it only runs when logged in.
+    
+elif st.session_state['authentication_status'] is False:
+    st.error('Username/password is incorrect')
+elif st.session_state['authentication_status'] is None:
+    st.warning('Please enter your username and password')
 
 # -----------------------
 # REGISTRATION (Optional)
@@ -164,4 +176,5 @@ elif login_status is False:
 
 elif login_status is None:
     st.warning("Please log in to continue")
+
 
