@@ -71,3 +71,26 @@ if st.session_state['authentication_status']:
         device_protection = st.selectbox("Device Protection", ["No internet service", "No", "Yes"])
         tech_support = st.selectbox("Tech Support", ["No internet service", "No", "Yes"])
         streaming_tv = st
+
+# -----------------------
+# REGISTRATION
+# -----------------------
+# Only show registration if the user is NOT logged in
+if not st.session_state['authentication_status']:
+    
+    # Use an expander to keep the login page clean
+    with st.expander("Create a New Account"):
+        try:
+            # The register_user function creates the form and returns True if successful
+            # Arguments: Form name, location (main/sidebar), pre-authorization (False)
+            if authenticator.register_user('Register User', preauthorization=False):
+                
+                # 1. Update the yaml file with the new user
+                with open('users.yaml', 'w') as file:
+                    yaml.dump(config, file, default_flow_style=False)
+                
+                # 2. Show success message
+                st.success('User registered successfully! You can now log in.')
+                
+        except Exception as e:
+            st.error(e)
