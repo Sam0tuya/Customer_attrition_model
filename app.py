@@ -173,9 +173,9 @@ elif st.session_state['authentication_status'] is None:
     st.markdown("---")
     with st.expander("Or Register a New Account"):
         try:
-            # FIX: changed 'preauthorization' to 'pre_authorization'
-            # We also capture the return values to check if registration happened
-            email, username, name = authenticator.register_user('Register User', pre_authorization=False)
+            # FIX: Changed to 'pre_authorized' based on your error message
+            # We pass an empty list [] to allow anyone to register
+            email, username, name = authenticator.register_user('Register User', pre_authorized=[])
             
             if email:
                 # 1. WRITE THE NEW USER TO THE YAML FILE
