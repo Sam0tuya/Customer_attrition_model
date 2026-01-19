@@ -36,7 +36,6 @@ st.title("Customer Attrition Prediction System")
 # -----------------------
 # LOGIN WIDGET
 # -----------------------
-# This renders the login form on the main page
 authenticator.login(location='main')
 
 # -----------------------
@@ -50,114 +49,128 @@ if st.session_state['authentication_status']:
     authenticator.logout(location='sidebar') 
     st.sidebar.write(f'Logged in as *{st.session_state["name"]}*')
 
-    # 2. Main Application Content
+    # 2. Main Welcome Message
     st.write(f'Welcome *{st.session_state["name"]}*')
     st.markdown("---")
-    st.subheader("Prediction Model")
-    st.write("Enter customer details to predict if they are likely to churn (leave):")
 
-    # --- INPUT FORM ---
-    col1, col2 = st.columns(2)
+    # -----------------------
+    # ACCESS CONTROL CHECK
+    # -----------------------
+    # Only run the prediction code if the username is 'admin'
+    if st.session_state["username"] == "admin":
+        
+        st.subheader("Prediction Model (Admin Access)")
+        st.write("Enter customer details to predict if they are likely to churn (leave):")
+
+        # --- INPUT FORM ---
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            gender = st.selectbox("Gender", ["Male", "Female"])
+            senior_citizen = st.selectbox("Senior Citizen", ["No", "Yes"])
+            partner = st.selectbox("Partner", ["No", "Yes"])
+            dependents = st.selectbox("Dependents", ["No", "Yes"])
+            tenure = st.number_input("Tenure (months)", min_value=0, max_value=72, value=12)
+            phone_service = st.selectbox("Phone Service", ["No", "Yes"])
+            multiple_lines = st.selectbox("Multiple Lines", ["No phone service", "No", "Yes"])
+            internet_service = st.selectbox("Internet Service", ["No", "DSL", "Fiber optic"])
+            online_security = st.selectbox("Online Security", ["No internet service", "No", "Yes"])
+            online_backup = st.selectbox("Online Backup", ["No internet service", "No", "Yes"])
+
+        with col2:
+            device_protection = st.selectbox("Device Protection", ["No internet service", "No", "Yes"])
+            tech_support = st.selectbox("Tech Support", ["No internet service", "No", "Yes"])
+            streaming_tv = st.selectbox("Streaming TV", ["No internet service", "No", "Yes"])
+            streaming_movies = st.selectbox("Streaming Movies", ["No internet service", "No", "Yes"])
+            contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
+            paperless_billing = st.selectbox("Paperless Billing", ["No", "Yes"])
+            payment_method = st.selectbox(
+                "Payment Method",
+                [
+                    "Electronic check",
+                    "Mailed check",
+                    "Bank transfer (automatic)",
+                    "Credit card (automatic)"
+                ]
+            )
+            monthly_charges = st.number_input("Monthly Charges", min_value=0.0, max_value=150.0, value=50.0)
+            total_charges = st.number_input("Total Charges", min_value=0.0, max_value=10000.0, value=600.0)
+
+        # --- PREPARE DATA ---
+        input_dict = {
+            "gender": gender,
+            "SeniorCitizen": 1 if senior_citizen == "Yes" else 0,
+            "Partner": partner,
+            "Dependents": dependents,
+            "tenure": tenure,
+            "PhoneService": phone_service,
+            "MultipleLines": multiple_lines,
+            "InternetService": internet_service,
+            "OnlineSecurity": online_security,
+            "OnlineBackup": online_backup,
+            "DeviceProtection": device_protection,
+            "TechSupport": tech_support,
+            "StreamingTV": streaming_tv,
+            "StreamingMovies": streaming_movies,
+            "Contract": contract,
+            "PaperlessBilling": paperless_billing,
+            "PaymentMethod": payment_method,
+            "MonthlyCharges": monthly_charges,
+            "TotalCharges": total_charges
+        }
+
+        input_df = pd.DataFrame([input_dict])
+
+        # --- ENCODING ---
+        cat_cols = input_df.select_dtypes(include=["object"]).columns
+
+        for col in cat_cols:
+            le = LabelEncoder()
+
+            if col == "gender":
+                le.classes_ = np.array(["Female", "Male"])
+            elif col in ["Partner", "Dependents", "PhoneService", "PaperlessBilling"]:
+                le.classes_ = np.array(["No", "Yes"])
+            elif col == "MultipleLines":
+                le.classes_ = np.array(["No", "No phone service", "Yes"])
+            elif col == "InternetService":
+                le.classes_ = np.array(["DSL", "Fiber optic", "No"])
+            elif col in [
+                "OnlineSecurity", "OnlineBackup", "DeviceProtection",
+                "TechSupport", "StreamingTV", "StreamingMovies"
+            ]:
+                le.classes_ = np.array(["No", "No internet service", "Yes"])
+            elif col == "Contract":
+                le.classes_ = np.array(["Month-to-month", "One year", "Two year"])
+            elif col == "PaymentMethod":
+                le.classes_ = np.array([
+                    "Bank transfer (automatic)",
+                    "Credit card (automatic)",
+                    "Electronic check",
+                    "Mailed check"
+                ])
+
+            try:
+                input_df[col] = le.transform(input_df[col])
+            except ValueError as e:
+                st.error(f"Encoding Error in column {col}: {e}")
+
+        # --- PREDICTION ---
+        st.markdown("---")
+        if st.button("Predict Churn"):
+            prediction = model.predict(input_df)[0]
+
+            if prediction == 1:
+                st.error("Customer is likely to churn ❌")
+            else:
+                st.success("Customer is likely to stay ✅")
     
-    with col1:
-        gender = st.selectbox("Gender", ["Male", "Female"])
-        senior_citizen = st.selectbox("Senior Citizen", ["No", "Yes"])
-        partner = st.selectbox("Partner", ["No", "Yes"])
-        dependents = st.selectbox("Dependents", ["No", "Yes"])
-        tenure = st.number_input("Tenure (months)", min_value=0, max_value=72, value=12)
-        phone_service = st.selectbox("Phone Service", ["No", "Yes"])
-        multiple_lines = st.selectbox("Multiple Lines", ["No phone service", "No", "Yes"])
-        internet_service = st.selectbox("Internet Service", ["No", "DSL", "Fiber optic"])
-        online_security = st.selectbox("Online Security", ["No internet service", "No", "Yes"])
-        online_backup = st.selectbox("Online Backup", ["No internet service", "No", "Yes"])
-
-    with col2:
-        device_protection = st.selectbox("Device Protection", ["No internet service", "No", "Yes"])
-        tech_support = st.selectbox("Tech Support", ["No internet service", "No", "Yes"])
-        streaming_tv = st.selectbox("Streaming TV", ["No internet service", "No", "Yes"])
-        streaming_movies = st.selectbox("Streaming Movies", ["No internet service", "No", "Yes"])
-        contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
-        paperless_billing = st.selectbox("Paperless Billing", ["No", "Yes"])
-        payment_method = st.selectbox(
-            "Payment Method",
-            [
-                "Electronic check",
-                "Mailed check",
-                "Bank transfer (automatic)",
-                "Credit card (automatic)"
-            ]
-        )
-        monthly_charges = st.number_input("Monthly Charges", min_value=0.0, max_value=150.0, value=50.0)
-        total_charges = st.number_input("Total Charges", min_value=0.0, max_value=10000.0, value=600.0)
-
-    # --- PREPARE DATA ---
-    input_dict = {
-        "gender": gender,
-        "SeniorCitizen": 1 if senior_citizen == "Yes" else 0,
-        "Partner": partner,
-        "Dependents": dependents,
-        "tenure": tenure,
-        "PhoneService": phone_service,
-        "MultipleLines": multiple_lines,
-        "InternetService": internet_service,
-        "OnlineSecurity": online_security,
-        "OnlineBackup": online_backup,
-        "DeviceProtection": device_protection,
-        "TechSupport": tech_support,
-        "StreamingTV": streaming_tv,
-        "StreamingMovies": streaming_movies,
-        "Contract": contract,
-        "PaperlessBilling": paperless_billing,
-        "PaymentMethod": payment_method,
-        "MonthlyCharges": monthly_charges,
-        "TotalCharges": total_charges
-    }
-
-    input_df = pd.DataFrame([input_dict])
-
-    # --- ENCODING ---
-    cat_cols = input_df.select_dtypes(include=["object"]).columns
-
-    for col in cat_cols:
-        le = LabelEncoder()
-
-        if col == "gender":
-            le.classes_ = np.array(["Female", "Male"])
-        elif col in ["Partner", "Dependents", "PhoneService", "PaperlessBilling"]:
-            le.classes_ = np.array(["No", "Yes"])
-        elif col == "MultipleLines":
-            le.classes_ = np.array(["No", "No phone service", "Yes"])
-        elif col == "InternetService":
-            le.classes_ = np.array(["DSL", "Fiber optic", "No"])
-        elif col in [
-            "OnlineSecurity", "OnlineBackup", "DeviceProtection",
-            "TechSupport", "StreamingTV", "StreamingMovies"
-        ]:
-            le.classes_ = np.array(["No", "No internet service", "Yes"])
-        elif col == "Contract":
-            le.classes_ = np.array(["Month-to-month", "One year", "Two year"])
-        elif col == "PaymentMethod":
-            le.classes_ = np.array([
-                "Bank transfer (automatic)",
-                "Credit card (automatic)",
-                "Electronic check",
-                "Mailed check"
-            ])
-
-        try:
-            input_df[col] = le.transform(input_df[col])
-        except ValueError as e:
-            st.error(f"Encoding Error in column {col}: {e}")
-
-    # --- PREDICTION ---
-    st.markdown("---")
-    if st.button("Predict Churn"):
-        prediction = model.predict(input_df)[0]
-
-        if prediction == 1:
-            st.error("Customer is likely to churn ❌")
-        else:
-            st.success("Customer is likely to stay ✅")
+    # -----------------------
+    # REGULAR USER VIEW
+    # -----------------------
+    else:
+        st.info("👋 Hello! You are logged in as a standard user.")
+        st.warning("You do not have permission to access the prediction model. Please contact the administrator if you need access.")
 
 # CASE 2: Login Failed
 elif st.session_state['authentication_status'] is False:
@@ -173,7 +186,7 @@ elif st.session_state['authentication_status'] is None:
     st.markdown("---")
     with st.expander("Or Register a New Account"):
         try:
-            # FIX: Removed 'Register User'. We only pass location and pre_authorized.
+            # Public Registration (no pre_authorized list)
             email, username, name = authenticator.register_user(location='main')
             
             if email:
@@ -184,4 +197,3 @@ elif st.session_state['authentication_status'] is None:
                 st.success('User registered successfully! Please log in above.')
         except Exception as e:
             st.error(e)
-
