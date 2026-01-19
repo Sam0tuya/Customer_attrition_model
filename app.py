@@ -21,33 +21,22 @@ with open("users.yaml") as file:
     config = yaml.load(file, Loader=SafeLoader)
 
 authenticator = stauth.Authenticate(
-    config["credentials"],
-    "customer_attrition_cookie",
-    "customer_attrition_signature",
+    credentials=config["credentials"],
+    cookie_name="customer_attrition_cookie",
+    key="customer_attrition_key",
     cookie_expiry_days=30
 )
 
 # -----------------------
-# LOGIN SECTION
+# LOGIN
 # -----------------------
 st.title("Customer Attrition Prediction System")
 
 # login returns True / False / None
-# The 'login' method now returns a tuple of 3 values
-name, authentication_status, username = authenticator.login(location='main')
-
-if login_status:
-    st.success(f"Welcome {authenticator.credentials['admin']['name']}!")
-    
-    # Your prediction app goes here
-
-elif login_status is False:
-    st.error("Username/password is incorrect")
-else:
-    st.warning("Please log in to continue")
+login_status = authenticator.login("Login", location="main")
 
 # -----------------------
-# REGISTRATION SECTION
+# REGISTRATION (Optional)
 # -----------------------
 try:
     if authenticator.register_user("Register", preauthorization=False):
@@ -58,10 +47,11 @@ except Exception as e:
 # -----------------------
 # ACCESS CONTROL
 # -----------------------
-if authentication_status:
+if login_status:
 
+    # Logout button
     authenticator.logout("Logout", "sidebar")
-    st.sidebar.success(f"Logged in as: {name}")
+    st.sidebar.success(f"Logged in as: {authenticator.credentials['admin']['name']}")
 
     st.title("Customer Attrition Prediction Model")
     st.write("Enter customer details to predict if they are likely to churn (leave):")
@@ -168,12 +158,8 @@ if authentication_status:
         else:
             st.success("Customer is likely to stay ✅")
 
-elif authentication_status is False:
+elif login_status is False:
     st.error("Username or password is incorrect")
 
-elif authentication_status is None:
-    st.warning("Please log in to access the app")
-
-
-
-
+elif login_status is None:
+    st.warning("Please log in to continue")
