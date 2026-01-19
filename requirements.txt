@@ -1,8 +1,8 @@
 streamlit
-streamlit-authenticator
 pandas
 numpy
 scikit-learn
 joblib
 pyyaml
+streamlit-authenticator
 bcrypt
