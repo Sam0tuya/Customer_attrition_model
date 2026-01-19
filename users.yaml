@@ -1,0 +1,6 @@
+credentials:
+  usernames:
+    admin:
+      email: admin@gmail.com
+      name: Admin User
+      password: "$2b$12$examplehashedpassword"
