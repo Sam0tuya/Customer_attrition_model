@@ -173,9 +173,9 @@ elif st.session_state['authentication_status'] is None:
     st.markdown("---")
     with st.expander("Or Register a New Account"):
         try:
-            # FIX: explicitly naming 'form_name' and 'location' fixes the error
+            # FIX: 'Register User' is passed first (positional), then the keywords
             email, username, name = authenticator.register_user(
-                form_name='Register User', 
+                'Register User', 
                 location='main', 
                 pre_authorized=[]
             )
