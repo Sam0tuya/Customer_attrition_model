@@ -173,12 +173,8 @@ elif st.session_state['authentication_status'] is None:
     st.markdown("---")
     with st.expander("Or Register a New Account"):
         try:
-            # FIX: 'Register User' is passed first (positional), then the keywords
-            email, username, name = authenticator.register_user(
-                'Register User', 
-                location='main', 
-                pre_authorized=[]
-            )
+            # FIX: Removed 'Register User'. We only pass location and pre_authorized.
+            email, username, name = authenticator.register_user(location='main', pre_authorized=[])
             
             if email:
                 # 1. WRITE THE NEW USER TO THE YAML FILE
