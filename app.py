@@ -33,7 +33,8 @@ authenticator = stauth.Authenticate(
 st.title("Customer Attrition Prediction System")
 
 # login returns True / False / None
-login_status = authenticator.login("Login", location="main")
+# The 'login' method now returns a tuple of 3 values
+name, authentication_status, username = authenticator.login(location='main')
 
 if login_status:
     st.success(f"Welcome {authenticator.credentials['admin']['name']}!")
@@ -172,6 +173,7 @@ elif authentication_status is False:
 
 elif authentication_status is None:
     st.warning("Please log in to access the app")
+
 
 
 
