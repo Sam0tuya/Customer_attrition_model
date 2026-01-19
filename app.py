@@ -1,3 +1,6 @@
+import yaml
+from yaml.loader import SafeLoader
+import streamlit_authenticator as stauth
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -114,4 +117,5 @@ if st.button("Predict"):
     if prediction == 1:
         st.error("Customer is likely to churn ❌")
     else:
+
         st.success("Customer is likely to stay ✅")
