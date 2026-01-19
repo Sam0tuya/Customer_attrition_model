@@ -174,7 +174,7 @@ elif st.session_state['authentication_status'] is None:
     with st.expander("Or Register a New Account"):
         try:
             # FIX: Removed 'Register User'. We only pass location and pre_authorized.
-            email, username, name = authenticator.register_user(location='main', pre_authorized=[])
+            email, username, name = authenticator.register_user(location='main')
             
             if email:
                 # 1. WRITE THE NEW USER TO THE YAML FILE
@@ -184,3 +184,4 @@ elif st.session_state['authentication_status'] is None:
                 st.success('User registered successfully! Please log in above.')
         except Exception as e:
             st.error(e)
+
