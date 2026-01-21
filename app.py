@@ -31,7 +31,7 @@ authenticator = stauth.Authenticate(
 # -----------------------
 # APP HEADER
 # -----------------------
-st.title("Customer Attrition Prediction System")
+st.title("Customer Attrition Prediction Model")
 
 # -----------------------
 # LOGIN WIDGET
@@ -197,3 +197,4 @@ elif st.session_state['authentication_status'] is None:
                 st.success('User registered successfully! Please log in above.')
         except Exception as e:
             st.error(e)
+
