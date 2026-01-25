@@ -38,7 +38,7 @@ with col1:
     # Try/Except block prevents the app from crashing if image is missing
     try:
         # Assumes you have a file named 'logo.jpg' in the same folder
-        st.image("logo.jpg", width=85)
+        st.image("assets/logo.png", width=85)
     except:
         st.warning("Logo not found")
 
@@ -209,3 +209,4 @@ elif st.session_state['authentication_status'] is None:
                 st.success('User registered successfully! Please log in above.')
         except Exception as e:
             st.error(e)
+
