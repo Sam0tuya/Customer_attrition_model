@@ -7,7 +7,6 @@ from sklearn.preprocessing import LabelEncoder
 import yaml
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
-from PIL import Image # precise image handling
 
 # -----------------------
 # Load trained model
@@ -31,18 +30,13 @@ authenticator = stauth.Authenticate(
 # -----------------------
 # APP HEADER (LOGO + TITLE)
 # -----------------------
-# This sits outside the login logic so it is always visible
+# [1, 5] means the text column is 5 times wider than the logo column
 col1, col2 = st.columns([1, 5])
 
 with col1:
-    # Try/Except block prevents the app from crashing if image is missing
-    try:
-        # Assumes you have a file named 'logo.jpg' in the same folder
-        st.image("assets/logo.png", width=85)
-        import os
-        st.write("Files in current folder:", os.listdir())
-    except:
-        st.warning("Logo not found")
+    # WEB URL LOGO: This link points to a generic analytics icon.
+    # You can replace this string with any image URL you find online.
+    st.image("https://upload.wikimedia.org/wikipedia/commons/9/93/New-mtn-logo.jpg", width=85)
 
 with col2:
     st.title("Customer Attrition System")
@@ -139,9 +133,7 @@ if st.session_state['authentication_status']:
 
         for col in cat_cols:
             le = LabelEncoder()
-            # Note: We are recreating encoders here for simplicity. 
-            # Ideally, these should be loaded from a saved pickle file 
-            # to ensure they match training exactly.
+
             if col == "gender":
                 le.classes_ = np.array(["Female", "Male"])
             elif col in ["Partner", "Dependents", "PhoneService", "PaperlessBilling"]:
@@ -211,5 +203,3 @@ elif st.session_state['authentication_status'] is None:
                 st.success('User registered successfully! Please log in above.')
         except Exception as e:
             st.error(e)
-
-
