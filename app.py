@@ -39,7 +39,7 @@ with col1:
     st.image("https://upload.wikimedia.org/wikipedia/commons/9/93/New-mtn-logo.jpg", width=85)
 
 with col2:
-    st.title("Customer Attrition System")
+    st.title("Customer Attrition Prediction System")
 
 # -----------------------
 # LOGIN WIDGET
@@ -203,3 +203,4 @@ elif st.session_state['authentication_status'] is None:
                 st.success('User registered successfully! Please log in above.')
         except Exception as e:
             st.error(e)
+
