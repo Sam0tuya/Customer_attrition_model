@@ -39,6 +39,8 @@ with col1:
     try:
         # Assumes you have a file named 'logo.jpg' in the same folder
         st.image("assets/logo.png", width=85)
+        import os
+        st.write("Files in current folder:", os.listdir())
     except:
         st.warning("Logo not found")
 
@@ -209,4 +211,5 @@ elif st.session_state['authentication_status'] is None:
                 st.success('User registered successfully! Please log in above.')
         except Exception as e:
             st.error(e)
+
 
