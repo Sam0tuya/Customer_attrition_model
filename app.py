@@ -30,12 +30,11 @@ authenticator = stauth.Authenticate(
 # -----------------------
 # APP HEADER (LOGO + TITLE)
 # -----------------------
-# [1, 5] means the text column is 5 times wider than the logo column
 col1, col2 = st.columns([1, 5])
 
 with col1:
-    # WEB URL LOGO: This link points to a generic analytics icon.
-    # You can replace this string with any image URL you find online.
+    # Adding a spacer pushes the logo down to match the title's baseline
+    st.write("")
     st.image("https://upload.wikimedia.org/wikipedia/commons/9/93/New-mtn-logo.jpg", width=85)
 
 with col2:
@@ -203,4 +202,5 @@ elif st.session_state['authentication_status'] is None:
                 st.success('User registered successfully! Please log in above.')
         except Exception as e:
             st.error(e)
+
 
