@@ -7,12 +7,12 @@ from sklearn.preprocessing import LabelEncoder
 import yaml
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
+from PIL import Image # precise image handling
 
 # -----------------------
 # Load trained model
 # -----------------------
 BASE_DIR = Path(__file__).parent
-# Ensure the models folder exists or adjust path as necessary
 model = joblib.load(BASE_DIR / "models" / "churn_model.pkl")
 
 # -----------------------
@@ -29,9 +29,21 @@ authenticator = stauth.Authenticate(
 )
 
 # -----------------------
-# APP HEADER
+# APP HEADER (LOGO + TITLE)
 # -----------------------
-st.title("Customer Attrition Prediction Model")
+# This sits outside the login logic so it is always visible
+col1, col2 = st.columns([1, 5])
+
+with col1:
+    # Try/Except block prevents the app from crashing if image is missing
+    try:
+        # Assumes you have a file named 'logo.jpg' in the same folder
+        st.image("logo.jpg", width=85)
+    except:
+        st.warning("Logo not found")
+
+with col2:
+    st.title("Customer Attrition System")
 
 # -----------------------
 # LOGIN WIDGET
@@ -56,7 +68,6 @@ if st.session_state['authentication_status']:
     # -----------------------
     # ACCESS CONTROL CHECK
     # -----------------------
-    # Only run the prediction code if the username is 'admin'
     if st.session_state["username"] == "admin":
         
         st.subheader("Prediction Model (Admin Access)")
@@ -126,7 +137,9 @@ if st.session_state['authentication_status']:
 
         for col in cat_cols:
             le = LabelEncoder()
-
+            # Note: We are recreating encoders here for simplicity. 
+            # Ideally, these should be loaded from a saved pickle file 
+            # to ensure they match training exactly.
             if col == "gender":
                 le.classes_ = np.array(["Female", "Male"])
             elif col in ["Partner", "Dependents", "PhoneService", "PaperlessBilling"]:
@@ -186,15 +199,13 @@ elif st.session_state['authentication_status'] is None:
     st.markdown("---")
     with st.expander("Or Register a New Account"):
         try:
-            # Public Registration (no pre_authorized list)
+            # Public Registration
             email, username, name = authenticator.register_user(location='main')
             
             if email:
-                # 1. WRITE THE NEW USER TO THE YAML FILE
                 with open('users.yaml', 'w') as file:
                     yaml.dump(config, file, default_flow_style=False)
                     
                 st.success('User registered successfully! Please log in above.')
         except Exception as e:
             st.error(e)
-
